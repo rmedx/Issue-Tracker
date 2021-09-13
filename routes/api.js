@@ -10,11 +10,12 @@ const issueSchema = new Schema({
   assigned_to: {type: String},
   status_text: {type: String},
   open: {type: Boolean},
+  _id: {type: mongoose.Types.ObjectId},
   issue_title: {type: String, unique: true, required: true},
   issue_text: {type: String, required: true},
   created_by: {type: String, required: true},
   created_on: {type: String},
-  updated_on: {type: String},
+  updated_on: {type: String}
 });
 // model for issue
 const Issue = mongoose.model('Issue', issueSchema);
