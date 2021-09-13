@@ -31,8 +31,8 @@ module.exports = function (app) {
     
     .post(function (req, res){
       let project = req.params.project;
-      let assigned_to = req.body.assigned_to;
-      let status_text = req.body.status_text;
+      let assigned_to = req.body.assigned_to ? req.body.assigned_to : "";
+      let status_text = req.body.status_text ? req.body.status_text : "";
       let issue_title = req.body.issue_title;
       let issue_text = req.body.issue_text;
       let created_by = req.body.created_by;
@@ -43,14 +43,12 @@ module.exports = function (app) {
       newIssue.save((err, issue) => {
         if (err) {
           if (issue_title == "" || issue_text == "" || created_by == "") {
-            return error("required field(s) missing")
+            return error("required field(s) missing");
           } else{
             return console.log("error saving issue");
           }
         } else {
-          console.log("issue =>");
-          console.log(issue);
-          return res.json({
+          let response = {
             assigned_to: issue.assigned_to,
             status_text: issue.status_text,
             open: issue.open,
@@ -60,7 +58,10 @@ module.exports = function (app) {
             created_by: issue.created_by,
             created_on: issue.created_on,
             updated_on: issue.updated_on
-          });
+          }
+          console.log("response =>");
+          console.log(response);
+          return res.json(response);
         }
       });
       console.log("post");
