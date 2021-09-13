@@ -25,8 +25,8 @@ module.exports = function (app) {
   
     .get(function (req, res){
       let project = req.params.project;
-      console.log("get");
-      console.log(project);
+      // console.log("get");
+      // console.log(project);
     })
     
     .post(function (req, res){
@@ -42,7 +42,8 @@ module.exports = function (app) {
       let newIssue = new Issue({assigned_to, status_text, issue_title, issue_text, created_by, created_on, updated_on, open});
       newIssue.save((err, issue) => {
         if (err) {
-          return { error: 'required field(s) missing' };
+          console.log("{ error: 'required field(s) missing' }")
+          return error({ error: 'required field(s) missing' });
         } else {
           let response = {
             assigned_to: issue.assigned_to,
@@ -55,25 +56,23 @@ module.exports = function (app) {
             created_on: issue.created_on,
             updated_on: issue.updated_on
           }
-          console.log("response =>");
-          console.log(response);
+          // console.log("response =>");
+          // console.log(response);
           return res.json(response);
         }
       });
-      console.log("post");
-      console.log(req.body);
     })
     
     .put(function (req, res){
       let project = req.params.project;
-      console.log("put");
-      console.log(project.title);
+      // console.log("put");
+      // console.log(project.title);
     })
     
     .delete(function (req, res){
       let project = req.params.project;
-      console.log("del");
-      console.log(project);
+      // console.log("del");
+      // console.log(project);
     });
     
 };
