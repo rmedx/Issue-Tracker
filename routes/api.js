@@ -42,8 +42,11 @@ module.exports = function (app) {
       let newIssue = new Issue({assigned_to, status_text, issue_title, issue_text, created_by, created_on, updated_on, open});
       newIssue.save((err, issue) => {
         if (err) {
-
-          return console.log("error saving issue");
+          if (issue_title == "" || issue_text == "" || created_by == "") {
+            return error("required field(s) missing")
+          } else{
+            return console.log("error saving issue");
+          }
         } else {
           console.log("issue =>");
           console.log(issue);
