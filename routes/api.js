@@ -9,7 +9,7 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 const issueSchema = new Schema({
   assigned_to: {type: String},
   status_text: {type: String},
-  open: {type: Boolean},
+  open: {type: Boolean, default: true},
   issue_title: {type: String, unique: true, required: true},
   issue_text: {type: String, required: true},
   created_by: {type: String, required: true},
@@ -42,6 +42,7 @@ module.exports = function (app) {
       let newIssue = new Issue({assigned_to, status_text, issue_title, issue_text, created_by, created_on, updated_on, open});
       newIssue.save((err, issue) => {
         if (err) {
+
           return console.log("error saving issue");
         } else {
           console.log("issue =>");
