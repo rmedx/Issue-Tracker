@@ -10,7 +10,6 @@ const issueSchema = new Schema({
   assigned_to: {type: String},
   status_text: {type: String},
   open: {type: Boolean},
-  _id: mongoose.Types.ObjectId(),
   issue_title: {type: String, unique: true, required: true},
   issue_text: {type: String, required: true},
   created_by: {type: String, required: true},
@@ -47,7 +46,17 @@ module.exports = function (app) {
         } else {
           console.log("issue =>");
           console.log(issue);
-          return res.json(issue);
+          return res.json({
+            assigned_to: issue.assigned_to,
+            status_text: issue.status_text,
+            open: issue.open,
+            _id: issue._id,
+            issue_title: issue.issue_title,
+            issue_text: issue.issue_text,
+            created_by: issue.created_by,
+            created_on: issue.created_on,
+            updated_on: issue.updated_on
+          });
         }
       });
       console.log("post");
