@@ -37,8 +37,8 @@ module.exports = function (app) {
       let issue_text = req.body.issue_text;
       let created_by = req.body.created_by;
       let open = true;
-      let created_on = new Date().toDateString();
-      let updated_on = new Date().toDateString();
+      let created_on = new Date().toISOString();
+      let updated_on = new Date().toISOString();
       let newIssue = new Issue({assigned_to, status_text, issue_title, issue_text, created_by, created_on, updated_on, open});
       newIssue.save((err, issue) => {
         if (err) {
