@@ -10,7 +10,7 @@ const issueSchema = new Schema({
   assigned_to: {type: String},
   status_text: {type: String},
   open: {type: Boolean},
-  _id: new mongoose.Types.ObjectId(),
+  _id: mongoose.Types.ObjectId(),
   issue_title: {type: String, unique: true, required: true},
   issue_text: {type: String, required: true},
   created_by: {type: String, required: true},
