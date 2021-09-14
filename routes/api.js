@@ -77,8 +77,8 @@ module.exports = function (app) {
       let project = req.params.project;
       let query = req.body;
       console.log("query");
-      console.log(query);
-      let _id = query._id ? ("" + query._id).slice(1) : "";
+      console.log(query);=
+      let _id = query._id;
       delete query._id;
       let filtered_query = {};
       for (let key in query) {
@@ -94,14 +94,38 @@ module.exports = function (app) {
         console.log("no field");
         return res.send({ error: 'no update field(s) sent', '_id': _id });
       } else {
-        Issue.findOneAndUpdate({_id}, {$set: filtered_query}, (err, docs) => {
+        // const findEditThenSave = (personId, done) => {
+        //   const foodToAdd = "hamburger";
+        //   Person.findById(personId, (err, individual) => {
+        //     if (err) {
+        //       return done(err);
+        //     }
+        //     individual.favoriteFoods.push(foodToAdd);
+        //     individual.save((err, individual) => {
+        //       if (err) {
+        //         return done(err);
+        //       }
+        //       done(null, individual);
+        //     })
+        //   });
+        // };
+        Issue.findById(_id).exec((err, issue) => {
           if (err) {
             console.log("no update");
+            console.log("id: " + _id);
             return res.send({ error: 'could not update', '_id': _id });
           } else {
-            console.log("updated id=>");
-            console.log(_id);
-            return res.send({  result: 'successfully updated', '_id': _id });
+            for (let key in filtered_query) {
+              issue[key] = filtered_query[key];
+            }
+            issue.save((err, doc) => {
+              if (err) {
+                console.log("no update 2");
+                return res.send({ error: 'could not update', '_id': _id });
+              } else {
+                return res.send({  result: 'successfully updated', '_id': _id });
+              }
+            })
           }
         });
       }
