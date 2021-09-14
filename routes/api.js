@@ -10,7 +10,7 @@ const issueSchema = new Schema({
   assigned_to: {type: String},
   status_text: {type: String},
   open: {type: Boolean, default: true},
-  issue_title: {type: String, unique: true, required: true},
+  issue_title: {type: String, required: true},
   issue_text: {type: String, required: true},
   created_by: {type: String, required: true},
   created_on: {type: String},
@@ -25,6 +25,12 @@ module.exports = function (app) {
   
     .get(function (req, res){
       let project = req.params.project;
+      Issue.find({issue_title: project}, (err, docs) => {
+        if (err) {
+          return console.log("eror getting issue");
+        }
+        return res.send(docs);
+      })
       // console.log("get");
       // console.log(project);
     })
@@ -42,7 +48,7 @@ module.exports = function (app) {
       let newIssue = new Issue({assigned_to, status_text, issue_title, issue_text, created_by, created_on, updated_on, open});
       newIssue.save((err, issue) => {
         if (err) {
-          throw new Error({ error: 'required field(s) missing' });
+          return res.send({ error: 'required field(s) missing' });
         } else {
           let response = {
             assigned_to: issue.assigned_to,
