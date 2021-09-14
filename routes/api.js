@@ -7,6 +7,7 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 
 // schema for issue
 const issueSchema = new Schema({
+  project_name: {type: String},
   assigned_to: {type: String},
   status_text: {type: String},
   open: {type: Boolean, default: true},
@@ -25,18 +26,19 @@ module.exports = function (app) {
   
     .get(function (req, res){
       let project = req.params.project;
-      Issue.find({issue_title: project}, (err, docs) => {
+      let query = req.query;
+      query.project_name = project;
+      Issue.find(query, (err, docs) => {
         if (err) {
-          return console.log("eror getting issue");
+          return console.log("error getting issue");
         }
         return res.send(docs);
       })
-      // console.log("get");
-      // console.log(project);
     })
     
     .post(function (req, res){
       let project = req.params.project;
+      let project_name = project;
       let assigned_to = req.body.assigned_to ? req.body.assigned_to : "";
       let status_text = req.body.status_text ? req.body.status_text : "";
       let issue_title = req.body.issue_title;
@@ -45,7 +47,7 @@ module.exports = function (app) {
       let open = true;
       let created_on = new Date().toISOString();
       let updated_on = new Date().toISOString();
-      let newIssue = new Issue({assigned_to, status_text, issue_title, issue_text, created_by, created_on, updated_on, open});
+      let newIssue = new Issue({project_name, assigned_to, status_text, issue_title, issue_text, created_by, created_on, updated_on, open});
       newIssue.save((err, issue) => {
         if (err) {
           return res.send({ error: 'required field(s) missing' });
@@ -61,23 +63,52 @@ module.exports = function (app) {
             created_on: issue.created_on,
             updated_on: issue.updated_on
           }
-          // console.log("response =>");
-          // console.log(response);
           return res.json(response);
         }
       });
     })
     
     .put(function (req, res){
+      // {  result: 'successfully updated', '_id': _id }
+      // { error: 'missing _id' }
+      // { error: 'no update field(s) sent', '_id': _id }
+      // { error: 'could not update', '_id': _id }
+
       let project = req.params.project;
-      // console.log("put");
-      // console.log(project.title);
+      let query = req.body;
+      console.log("query");
+      console.log(query);
+      let _id = query._id ? ("" + query._id).slice(1) : "";
+      delete query._id;
+      let filtered_query = {};
+      for (let key in query) {
+        if (query[key] != "") {
+          filtered_query[key] = query[key];
+        }
+      }
+      console.log(filtered_query);
+      if (_id == "") {
+        console.log("no id");
+        return res.send({ error: 'missing _id' });
+      } else if (Object.keys(filtered_query).length == 0) {
+        console.log("no field");
+        return res.send({ error: 'no update field(s) sent', '_id': _id });
+      } else {
+        Issue.findOneAndUpdate({_id}, {$set: filtered_query}, (err, docs) => {
+          if (err) {
+            console.log("no update");
+            return res.send({ error: 'could not update', '_id': _id });
+          } else {
+            console.log("updated id=>");
+            console.log(_id);
+            return res.send({  result: 'successfully updated', '_id': _id });
+          }
+        });
+      }
     })
     
     .delete(function (req, res){
       let project = req.params.project;
-      // console.log("del");
-      // console.log(project);
     });
     
 };
