@@ -69,61 +69,31 @@ module.exports = function (app) {
     })
     
     .put(function (req, res){
-      // {  result: 'successfully updated', '_id': _id }
-      // { error: 'missing _id' }
-      // { error: 'no update field(s) sent', '_id': _id }
-      // { error: 'could not update', '_id': _id }
-
       let project = req.params.project;
       let query = req.body;
-      console.log("query");
-      console.log(query);=
-      let _id = query._id;
-      delete query._id;
-      let filtered_query = {};
-      for (let key in query) {
-        if (query[key] != "") {
-          filtered_query[key] = query[key];
-        }
-      }
-      console.log(filtered_query);
-      if (_id == "") {
-        console.log("no id");
+      if (!query._id) {
         return res.send({ error: 'missing _id' });
-      } else if (Object.keys(filtered_query).length == 0) {
-        console.log("no field");
-        return res.send({ error: 'no update field(s) sent', '_id': _id });
+      } else if (Object.keys(query).length == 1) {
+        return res.send({ error: 'no update field(s) sent', '_id': query._id });
       } else {
-        // const findEditThenSave = (personId, done) => {
-        //   const foodToAdd = "hamburger";
-        //   Person.findById(personId, (err, individual) => {
-        //     if (err) {
-        //       return done(err);
-        //     }
-        //     individual.favoriteFoods.push(foodToAdd);
-        //     individual.save((err, individual) => {
-        //       if (err) {
-        //         return done(err);
-        //       }
-        //       done(null, individual);
-        //     })
-        //   });
-        // };
-        Issue.findById(_id).exec((err, issue) => {
+        query["updated_on"] = new Date().toISOString();
+        Issue.findById(query._id).exec((err, issue) => {
           if (err) {
-            console.log("no update");
-            console.log("id: " + _id);
-            return res.send({ error: 'could not update', '_id': _id });
+            return res.send({ error: 'could not update', '_id': query._id });
           } else {
-            for (let key in filtered_query) {
-              issue[key] = filtered_query[key];
+            if (issue == null) {
+              return res.send({ error: 'could not update', '_id': query._id });
+            }
+            for (let key in query) {
+              if (key != "_id") {
+                issue[key] = query[key];
+              }
             }
             issue.save((err, doc) => {
               if (err) {
-                console.log("no update 2");
-                return res.send({ error: 'could not update', '_id': _id });
+                return res.send({ error: 'could not update', '_id': query._id });
               } else {
-                return res.send({  result: 'successfully updated', '_id': _id });
+                return res.send({  result: 'successfully updated', '_id': query._id });
               }
             })
           }
@@ -133,6 +103,18 @@ module.exports = function (app) {
     
     .delete(function (req, res){
       let project = req.params.project;
+      if (req.body_id == "") {
+        return res.send({ error: 'missing _id' });
+      } else if (Object.keys(req.body).length == 0) {
+        return res.send({ error: 'missing _id' });
+      } else {
+        Issue.findByIdAndRemove(req.body._id).exec((err, docs) => {
+          if (err) {
+            return res.send({ error: 'could not delete', '_id': req.body._id });
+          } else {
+            return docs ? res.send({ result: 'successfully deleted', '_id': req.body._id }) : res.send({ error: 'could not delete', '_id': req.body._id });
+          }
+        });
+      }
     });
-    
 };
